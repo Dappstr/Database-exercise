@@ -49,6 +49,46 @@ void databaseLoad(Connection* connection)
     }
 }
 
+Connection* db_Open(const char* filename, char mode)
+{
+    Connection* connection = malloc(sizeof(Connection));
+
+    if(!connection){
+        die("Memory error!\n");
+    }
+    switch(mode)
+    {
+        case 'c':
+            connection->file = fopen(filename, "w");
+            break;
+
+        default:
+            connection->file = fopen(filename, "r+");
+            if(connection->file) {
+                databaseLoad(connection);
+            }
+            break;
+    }
+    if(!connection->file) {
+        die("Failed to open file!\n");
+    }
+
+    return connection;
+}
+
+void Database_close(Connection* connection)
+{
+    if(connection) {
+        if(connection->file) {
+            fclose(connection->file);
+        }
+        if(connection->db) {
+            free(connection->db);
+        }
+        free(connection);
+    }
+}
+
 int main()
 {
 
